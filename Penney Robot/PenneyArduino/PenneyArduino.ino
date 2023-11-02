@@ -1,6 +1,23 @@
 #include <Wire.h>
 #include <SoftwareSerial.h>
 
+// ROBOT PINOUT CONFIGURATIONS ///////////////////////
+
+// IR Sensor Connections (IR1 is on the left when looking at robot from behind)
+#define IR1 A3
+#define IR2 A2
+#define IR3 A1
+#define IR4 A0
+
+// Motor connections (using PWM pins on the arduino)
+#define MOTOR_A1 3
+#define MOTOR_A2 5
+#define MOTOR_B1 10
+#define MOTOR_B2 11
+
+//////////////////////////////////////////////////////
+
+
 // Misc Program Variables
 int currentX = 0;
 int currentY = 0;
@@ -14,19 +31,7 @@ bool isTurning = false;
 unsigned long turningStartTime = 0;   // Variable to hold the time when turning started
 unsigned long lineLostStartTime = 0;  // Add a new variable to hold the time when the robot first loses sight of the line
 
-// IR Sensor Connections
-#define IR1 A3
-#define IR2 A2
-#define IR3 A1
-#define IR4 A0
-
-// Motor connections
-#define MOTOR_A1 3
-#define MOTOR_A2 5
-#define MOTOR_B1 10
-#define MOTOR_B2 11
-
-// Software Serial Setup
+// Software Serial Setup for ESP8266
 SoftwareSerial mySerial(12, 13);
 
 // Variables for asynchronous NodeMCU ESP messages.
@@ -56,6 +61,29 @@ void setup() {
   digitalWrite(MOTOR_B1, LOW);
   digitalWrite(MOTOR_B2, LOW);
 }
+
+void loop() {
+  // Example usage of the new functions
+  followLine();  // Follow the line until an end is encountered
+  stop(0);
+  turn(0);        // Turn left
+
+  followLine(1);  // Follow the line until number intersections encountered
+  stop(0);
+  turn(0);       // Turn left
+
+  followLine();  // Follow the line until an end is encountered
+  stop(0);
+  turn(1);        // Turn right
+
+  followLine(1);  // Follow the line until number intersections encountered
+  stop(0);
+  turn(1);  // Turn right
+}
+
+/********************
+* Functions For Moving The Robot
+********************/
 
 void handleIntersectionDetection() {
 
@@ -196,21 +224,3 @@ void followLine(int intersections = -1) {
   }
 }
 
-void loop() {
-  // Example usage of the new functions
-  followLine();  // Follow the line until number intersections encountered
-  stop(0);
-  turn(0);        // Turn left
-
-  followLine(1);  // Follow the line until number intersections encountered
-  stop(0);
-  turn(0);       // Turn left
-
-  followLine();  // Follow the line until number intersections encountered
-  stop(0);
-  turn(1);        // Turn right
-
-  followLine(1);  // Follow the line until number intersections encountered
-  stop(0);
-  turn(1);  // Turn right
-}
